@@ -12,9 +12,9 @@ public class ExpenseTracker {
     }
 
     public void run() {
-        System.out.println("*".repeat(40));
+        System.out.println("*".repeat(45));
         System.out.println("EXPENSE TRACKER");
-        System.out.println("*".repeat(40));
+        System.out.println("*".repeat(45));
 
         boolean running = true;
         while (running) {
@@ -35,15 +35,18 @@ public class ExpenseTracker {
                     viewMonthlyTrend();
                     break;
                 case 5:
-                    viewHighestLowestCategories();
+                    viewWeeklyTrend();
                     break;
                 case 6:
-                    viewAllExpenses();
+                    viewHighestLowestCategories();
                     break;
                 case 7:
-                    loadSampleData();
+                    viewAllExpenses();
                     break;
                 case 8:
+                    loadSampleData();
+                    break;
+                case 9:
                     running = false;
                     System.out.println("\nExiting expense tracker");
                     break;
@@ -62,15 +65,16 @@ public class ExpenseTracker {
         System.out.println("2. View Total Expenses");
         System.out.println("3. View Expenses By Category");
         System.out.println("4. View Monthly Trend");
-        System.out.println("5. View Highest/Lowest Spending Categories");
-        System.out.println("6. View All Expenses");
-        System.out.println("7. Load Sample Data");
-        System.out.println("8. Exit");
+        System.out.println("5. View Weekly Trend");
+        System.out.println("6. View Highest/Lowest Spending Categories");
+        System.out.println("7. View All Expenses");
+        System.out.println("8. Load Sample Data");
+        System.out.println("9. Exit");
         System.out.println("=".repeat(45));
     }
 
     private int getMenuChoice() {
-        System.out.print("\nEnter an option (1-8): ");
+        System.out.print("\nEnter an option (1-9): ");
         try {
             return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
@@ -140,6 +144,32 @@ public class ExpenseTracker {
 
         for (Map.Entry<String, Double> entry : monthlyTrend.entrySet()) {
             System.out.printf("%-15s $%.2f\n", entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void viewWeeklyTrend() {
+        System.out.println("\n--- View Weekly Trend ---");
+        Map<String, Double> weeklyTrend = expenseManager.getWeeklyTrend();
+
+        if (weeklyTrend.isEmpty()) {
+            System.out.println("No expenses recorded yet.");
+            return;
+        }
+
+        System.out.println(String.format("%-30s %s", "Week", "Total"));
+        System.out.println("-".repeat(45));
+
+        for (Map.Entry<String, Double> entry : weeklyTrend.entrySet()) {
+            // currently in YYYY-MM-Wx, will make it into Month year - Week x
+            String[] parts = entry.getKey().split("-W");
+            String[] dateParts = parts[0].split("-");
+            int year = Integer.parseInt(dateParts[0]);
+            int month = Integer.parseInt(dateParts[1]);
+            int week = Integer.parseInt(parts[1]);
+
+            String monthName = java.time.Month.of(month).toString().substring(0,3);
+            String display = monthName.charAt(0) + monthName.substring(1).toLowerCase() + " " + year + " - Week " + week;
+            System.out.printf("%-30s $%.2f\n", display, entry.getValue());
         }
     }
 

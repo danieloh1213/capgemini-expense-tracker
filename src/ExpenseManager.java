@@ -56,7 +56,7 @@ public class ExpenseManager {
     // gets the totals by each month
     public Map<String, Double> getMonthlyTrend() {
         Map<String, Double> monthlyTotals = new HashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
 
         for (Expense expense : expenses) {
             String monthKey = expense.getDate().format(formatter);
@@ -66,6 +66,25 @@ public class ExpenseManager {
 
         // return a treemap because treemap is sorted
         return new TreeMap<>(monthlyTotals);
+    }
+
+    // gets the totals by each week
+    public Map<String, Double> getWeeklyTrend() {
+        Map<String, Double> weeklyTotals = new HashMap<>();
+
+        for (Expense expense : expenses) {
+            LocalDate date = expense.getDate();
+
+            // creating a sortable key in the form of year month week
+            String sortKey = String.format("%d-%02d-W%d",
+                    date.getYear(),
+                    date.getMonthValue(),
+                    (date.getDayOfMonth() - 1) / 7 + 1);
+
+            weeklyTotals.put(sortKey, weeklyTotals.getOrDefault(sortKey, 0.0) + expense.getAmount());
+        }
+
+        return new TreeMap<>(weeklyTotals);
     }
 
     // iterates through the category totals and finds the category with the highest amount
@@ -118,7 +137,9 @@ public class ExpenseManager {
     }
 
     public List<Expense> getAllExpenses() {
-        return new ArrayList<>(expenses);
+        List<Expense> expenses = new ArrayList<>(this.expenses);
+        expenses.sort(Comparator.comparing(Expense::getDate));
+        return expenses;
     }
 
     public int getExpensesCount() {
