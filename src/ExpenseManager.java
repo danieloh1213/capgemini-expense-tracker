@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.*;
 
 public class ExpenseManager {
@@ -27,7 +28,9 @@ public class ExpenseManager {
         }
         LocalDate dateObj;
         try {
-            dateObj = LocalDate.parse(date, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/uuuu");
+            formatter = formatter.withResolverStyle(ResolverStyle.STRICT);
+            dateObj = LocalDate.parse(date, DateTimeFormatter.ofPattern("MM/dd/uuuu"));
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid date format. Use \"MM/dd/yyyy\"");
         }

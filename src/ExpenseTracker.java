@@ -1,3 +1,7 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Map;
 import java.util.List;
 import java.util.Scanner;
@@ -106,8 +110,16 @@ public class ExpenseTracker {
             System.out.print("Amount: $");
             double amount = Double.parseDouble(scanner.nextLine().trim());
 
-            System.out.print("Date (MM/DD/YYYY): ");
+            System.out.print("Date (MM/dd/yyyy): ");
             String date = scanner.nextLine().trim();
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/uuuu");
+                formatter = formatter.withResolverStyle(ResolverStyle.STRICT);
+                LocalDate.parse(date, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date. Error: " + e.getMessage());
+                return;
+            }
 
             System.out.print("Description: ");
             String description = scanner.nextLine().trim();
