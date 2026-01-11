@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -144,6 +148,39 @@ public class ExpenseManager {
 
     public int getExpensesCount() {
         return expenses.size();
+    }
+
+    // save expenses to a file
+    // input: filename
+    public void saveToFile(String filename) {
+        try (FileWriter fileWriter = new FileWriter(filename)) {
+            List<Expense> sortedExpenses = new ArrayList<>(this.expenses);
+            sortedExpenses.sort(Comparator.comparing(Expense::getDate));
+            for (Expense expense : sortedExpenses) {
+                fileWriter.write(String.format("%s,%f,%s,%s\n",
+                        expense.getCategory(),
+                        expense.getAmount(),
+                        expense.getDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+                        expense.getDescription()));
+            }
+            System.out.println("Expense saved to " + filename);
+        } catch (IOException e) {
+            System.out.println("Error saving to file: " + e.getMessage());
+        }
+    }
+
+    // load expenses from file
+    public void loadFromFile(String filename) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                addExpense(parts[0], Double.parseDouble(parts[1]), parts[2], parts[3]);
+            }
+            System.out.println("Expense loaded from " + filename);
+        } catch (IOException e) {
+            System.out.println("Error loading file: " + e.getMessage());
+        }
     }
 
     public void loadSeedData() {

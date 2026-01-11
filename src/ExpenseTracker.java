@@ -1,6 +1,12 @@
 import java.util.Map;
 import java.util.List;
 import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.File;
 
 public class ExpenseTracker {
     private ExpenseManager expenseManager;
@@ -47,6 +53,12 @@ public class ExpenseTracker {
                     loadSampleData();
                     break;
                 case 9:
+                    saveExpensesToFile();
+                    break;
+                case 10:
+                    loadExpensesFromFile();
+                    break;
+                case 11:
                     running = false;
                     System.out.println("\nExiting expense tracker");
                     break;
@@ -69,12 +81,14 @@ public class ExpenseTracker {
         System.out.println("6. View Highest/Lowest Spending Categories");
         System.out.println("7. View All Expenses");
         System.out.println("8. Load Sample Data");
-        System.out.println("9. Exit");
+        System.out.println("9. Save Expenses to File");
+        System.out.println("10. Load Expenses from File");
+        System.out.println("11. Exit");
         System.out.println("=".repeat(45));
     }
 
     private int getMenuChoice() {
-        System.out.print("\nEnter an option (1-9): ");
+        System.out.print("\nEnter an option (1-11): ");
         try {
             return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
@@ -206,6 +220,43 @@ public class ExpenseTracker {
     private void loadSampleData() {
         System.out.println("\n--- Load Sample Data ---");
         expenseManager.loadSeedData();
+    }
+
+    private void saveExpensesToFile() {
+        System.out.print("\nEnter filename (must be csv): ");
+        String filename = scanner.nextLine().trim();
+
+        if (filename.isEmpty()) {
+            System.out.println("Error: No filename provided.");
+            return;
+        }
+        if (!filename.endsWith(".csv")) {
+            System.out.println("Error: Filename must end with .csv");
+            return;
+        }
+
+        expenseManager.saveToFile(filename);
+    }
+
+    private void loadExpensesFromFile() {
+        System.out.print("\nEnter filename (must be csv): ");
+        String filename = scanner.nextLine().trim();
+
+        if (filename.isEmpty()) {
+            System.out.println("Error: No filename provided.");
+            return;
+        }
+        if (!filename.endsWith(".csv")) {
+            System.out.println("Error: Filename must end with .csv");
+            return;
+        }
+        File file = new File(filename);
+        if (!file.exists()) {
+            System.out.println("Error: File '"+ filename +"' does not exist.");
+            return;
+        }
+
+        expenseManager.loadFromFile(filename);
     }
 
     public static void main(String[] args) {
